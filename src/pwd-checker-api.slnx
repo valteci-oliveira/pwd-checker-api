@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="pwd-checker-api-test/pwd-checker-api-test.csproj" />
+  <Project Path="pwd-checker-api/pwd-checker-api.csproj" />
+</Solution>
