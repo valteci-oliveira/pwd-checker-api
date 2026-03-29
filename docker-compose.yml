@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  pwd-checker-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pwd-checker-api
+    ports:
+      - "5000:5238"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5238
+    volumes:
+      - ./src/pwd-checker-api:/app/src/pwd-checker-api:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -1,0 +1,8 @@
+# Production-only ignore rules
+# This extends the main .dockerignore
+
+# Development dependencies
+*.sln
+.vscode/
+.idea/
+.github/

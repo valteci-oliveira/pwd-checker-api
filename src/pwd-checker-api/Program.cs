@@ -24,6 +24,7 @@ public class Program
 
         services.AddOpenApi();
         services.AddSwaggerGen();
+        services.AddHealthChecks();
 
         services.AddLogging(loggingBuilder =>
         {
@@ -34,7 +35,6 @@ public class Program
         });
 
         services.AddPasswordValidateServices(configuration);
-        services.AddControllers();
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAll", builder =>
@@ -62,7 +62,7 @@ public class Program
 
         app.UseHttpsRedirection();
         app.UseCors("AllowAll");
-        app.MapControllers();
+        app.UseHealthChecks("/health");
         app.ConfigureFeatures();
 
         var logger = app.Services.GetRequiredService<ILogger<Program>>();

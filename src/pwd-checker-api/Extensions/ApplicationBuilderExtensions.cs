@@ -6,9 +6,11 @@ public static class ApplicationBuilderExtensions
 {
     public static WebApplication ConfigureFeatures(this WebApplication app)
     {
-        const string groupPrefix = "api/v1/password";
+        const string groupPrefix = "api/v1";
 
-        var passwordGroup = app.MapGroup(groupPrefix)
+        var apiGroup = app.MapGroup(groupPrefix);
+
+        var passwordGroup = apiGroup.MapGroup("password")
             .WithName("PasswordValidation");
 
         passwordGroup.MapPost("/validate", PasswordValidateHandler.Handle)
