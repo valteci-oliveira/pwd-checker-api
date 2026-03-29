@@ -1,17 +1,17 @@
 # pwd-checker-api
 
-API de validação de senha construída com ASP.NET Core 10.0, apresentando um padrão chain of responsibility para regras de validação flexíveis.
+API de validação de senha construída com ASP.NET Core, que apresenta o padrão ***Chain of Responsibility*** para criação regras de validação flexíveis.
 
 ## Decisões e Motivações
 
 Para execução deste projeto foram realizadas duas grandes decisões que merecem destaque:
 1. **Escolha da arquitetura VerticalSlice**
-    - **Motivação:** A escolha da arquitetura VerticalSlice foi motivada por o projeto ser um projeto inicialmente pequeno onde é possível voltar o core da aplicação para a funcionalidade em si, deixando o projeto mais coeso na estrutura da "Feature" e com baixo acomplamento com possíveis features que possam ser implementadas; <br><br>
+    - **Motivação:** A escolha da arquitetura VerticalSlice foi motivada por se tratar de um projeto onde é possível voltar o core da aplicação para a funcionalidade em si, deixando o projeto mais coeso em torno da estrutura da "Feature" e com baixo acomplamento com possíveis "Features" que possam ser adicionadas ao projeto. <br><br>
 
 
-2. **Escolha do padrão Chain of Responsability** (para validação das regras de senha)
-    - **Motivação:** A escolha deste padrão se deu para evitar o acomplamento elevado entre as regras de negócio de validação, fazendo com que cada regra tenha uma única responsabilidade (SRP), permitindo que seja possível testar unitariamente cada regra de validação. <br>
-    Como resutaldo, o código ficou mais fácil de dar manutenção e extensível para a inclusão de futuras regras de validação, sem impacto nas demais.
+2. **Escolha do padrão Chain of Responsability**
+    - **Motivação:** A escolha deste padrão se deu para evitar o acomplamento elevado entre as regras de negócio de validação de senha, fazendo com que cada regra tenha uma única responsabilidade (SRP), permitindo que seja possível testar unitariamente cada regra de validação. <br>
+    Como resutaldo, o código ficou mais simples de dar manutenção e extensível para a inclusão de futuras regras de validação, sem impacto nas demais.
 
 ## Funcionalidades do Projeto
 
@@ -20,7 +20,6 @@ Para execução deste projeto foram realizadas duas grandes decisões que merece
 - ✅ Documentação Swagger/OpenAPI
 - ✅ Testes unitários abrangentes com Moq
 - ✅ Containerização Docker
-- ✅ Configuração pronta para produção
 
 ## Estrutura do Projeto
 
@@ -32,12 +31,12 @@ pwd-checker-api/
 │   │   │   └── PasswordValidate/
 │   │   │       ├── Domain/           # Lógica de negócio principal, handlers
 │   │   │       ├── Application/      # Serviços, DTOs, handlers
-│   │   │       └── Infra/            # Injeção de dependências
+│   │   │       └── Infra/            # Acesso à recursos externos (Sem uso neste projeto)
 │   │   └── Program.cs                # Bootstrap da aplicação
 │   └── pwd-checker-api-test/         # Testes unitários
 │       └── Features/
 │           └── PasswordValidate/
-│               └── [Domain, Application] testes
+│               └── [Domain, Application] Testes
 ├── Dockerfile                        # Build Docker multi-stage
 ├── docker-compose.yml                # Ambiente de desenvolvimento
 ├── docker-compose.prod.yml           # Ambiente de produção
@@ -62,18 +61,19 @@ A API usa uma cadeia de handlers (padrão Chain of Responsability) para validar 
 - .NET 10.0 SDK
 - Visual Studio Code ou IDE de sua escolha
 
-#### Executar a API
+### Compilar e Executar
 ```bash
-cd src/pwd-checker-api
-dotnet run
+dotnet build src/
+dotnet run --project src/pwd-checker-api/pwd-checker-api.csproj
 ```
 
-A API estará disponível em `http://localhost:5238`
+A API estará disponível em `http://localhost:5238` <br>
+(HealthCheck -> http://localhost:5238/health)
 
-#### Acessar Swagger UI
-```
-http://localhost:5238/swagger/index.html
-```
+#### Documentação Swagger
+- Desenvolvimento (local): `http://localhost:5238/swagger`
+- Desenvolvimento (Docker): `http://localhost:5000/swagger`
+
 
 #### Executar Testes
 ```bash
@@ -97,7 +97,7 @@ docker-compose -f docker-compose.prod.yml up -d
 docker build -t pwd-checker-api:latest .
 
 # Executar container
-docker run -p 5238:5238 pwd-checker-api:latest
+docker run -p 5000:5238 pwd-checker-api:latest
 ```
 
 ## Endpoints da API
@@ -128,10 +128,12 @@ Content-Type: application/json
 }
 ```
 
-### CURL de Exemplo
+### CURLs de Exemplo
+
+#### LOCAL (PORTA: 5238)
 ```bash
 curl -X 'POST' \
-  'http://localhost:5238//api/v1/password/validate' \
+  'http://localhost:5238/api/v1/password/validate' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -139,27 +141,24 @@ curl -X 'POST' \
 }'
 ```
 
-## Testes
-
-### Testes Unitários
+#### DOCKER - DEV (PORTA: 5000)
 ```bash
-cd src/pwd-checker-api-test
-dotnet test
+curl -X 'POST' \
+  'http://localhost:5000/api/v1/password/validate' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "password": "2342342"
+}'
 ```
 
-## Desenvolvimento
-
-### Compilar e Executar
+#### DOCKER - PROD (PORTA: 9000)
 ```bash
-dotnet build
-dotnet run --project src/pwd-checker-api/pwd-checker-api.csproj
+curl -X 'POST' \
+  'http://localhost:9000/api/v1/password/validate' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "password": "2342342"
+}'
 ```
-
-### Executar Testes Específicos
-```bash
-dotnet test --filter "TestName"
-```
-
-### Visualizar Documentação Swagger
-- Desenvolvimento (local): `http://localhost:5238/swagger`
-- Desenvolvimento (Docker): `http://localhost:5000/swagger`
