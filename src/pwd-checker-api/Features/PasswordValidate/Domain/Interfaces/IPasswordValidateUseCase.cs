@@ -4,5 +4,5 @@ namespace pwd_checker_api.Features.PasswordValidate.Domain.Interfaces;
 
 public interface IPasswordValidateUseCase
 {
-    PasswordValidateResult Execute(string password);
+    Task<PasswordValidateResult> ExecuteAsync(string password);
 }

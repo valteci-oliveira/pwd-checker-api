@@ -1,7 +1,7 @@
 using pwd_checker_api.Features.PasswordValidate.Application.Interfaces;
 using pwd_checker_api.Features.PasswordValidate.Application.Services;
 using pwd_checker_api.Features.PasswordValidate.Domain.Interfaces;
-using pwd_checker_api.Features.PasswordValidate.Domain.UseCase;
+using pwd_checker_api.Features.PasswordValidate.Domain.UseCases;
 
 namespace pwd_checker_api.Extensions;
 

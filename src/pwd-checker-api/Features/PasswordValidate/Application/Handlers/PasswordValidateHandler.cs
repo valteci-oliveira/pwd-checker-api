@@ -17,6 +17,12 @@ public static class PasswordValidateHandler
         try
         {
             var result = await service.ExecuteAsync(request);
+            
+            if(result.IsValid == false)
+            {
+                return Results.UnprocessableEntity(result);
+            }
+
             return Results.Ok(result);
         }
         catch (Exception)
