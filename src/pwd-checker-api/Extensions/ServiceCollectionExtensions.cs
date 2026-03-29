@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSingleton<IPasswordValidateUseCase, PasswordValidateUseCase>();
+        services.AddScoped<IPasswordValidateUseCase, PasswordValidateUseCase>();
         services.AddScoped<IPasswordValidateService, PasswordValidateService>();
 
         return services;

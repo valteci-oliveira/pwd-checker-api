@@ -11,7 +11,10 @@ public static class PasswordValidateHandler
     {
         if (request == null || string.IsNullOrWhiteSpace(request.Password))
         {
-            return Results.BadRequest(new { message = "Password is required." });
+            return Results.BadRequest(
+                new PasswordValidateResult { 
+                    IsValid = false,
+                    Message = "Password is required." });
         }
 
         try

@@ -4,8 +4,10 @@ using pwd_checker_api.Features.PasswordValidate.Domain.Interfaces;
 
 namespace pwd_checker_api.Features.PasswordValidate.Domain.UseCases
 {
-    public class PasswordValidateUseCase : IPasswordValidateUseCase
+    public class PasswordValidateUseCase(ILogger<PasswordValidateUseCase> logger) : IPasswordValidateUseCase
     {
+        private readonly ILogger<PasswordValidateUseCase> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         public async Task<PasswordValidateResult> ExecuteAsync(string password)
         {
             var validateChain = BuildValidateHandlerChain();
@@ -22,9 +24,14 @@ namespace pwd_checker_api.Features.PasswordValidate.Domain.UseCases
 
         private static BaseHandler BuildValidateHandlerChain()
         {
-            var handlerChain = 
-                new MinLengthHandler()
-                  .SetNext(new DigitHandler()); 
+            var handlerChain = new MinLengthHandler();
+            
+            handlerChain
+                .SetNext(new NoRepeatCharHandler())
+                .SetNext(new LowercaseHandler())
+                .SetNext(new UppercaseHandler())
+                .SetNext(new SpecialCharHandler())
+                .SetNext(new DigitHandler());
 
             return handlerChain;
         }

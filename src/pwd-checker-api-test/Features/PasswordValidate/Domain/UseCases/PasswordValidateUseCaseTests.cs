@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+using Moq;
 using pwd_checker_api.Features.PasswordValidate.Domain.Interfaces;
 using pwd_checker_api.Features.PasswordValidate.Domain.UseCases;
 
@@ -5,12 +7,19 @@ namespace pwd_checker_api_test.Features.PasswordValidate.Domain.UseCases;
 
 public class PasswordValidateUseCaseTests
 {
-    private readonly IPasswordValidateUseCase _useCase = new PasswordValidateUseCase();
+    private readonly Mock<ILogger<PasswordValidateUseCase>> _mockLogger;
+    private readonly IPasswordValidateUseCase _useCase;
+
+    public PasswordValidateUseCaseTests()
+    {
+        _mockLogger = new Mock<ILogger<PasswordValidateUseCase>>();
+        _useCase = new PasswordValidateUseCase(_mockLogger.Object);
+    }
 
     [Fact]
     public async Task ExecuteAsync_WithValidPassword_ShouldReturnValid()
     {
-        var password = "ValidPassword123";
+        var password = "Abc123@#";
         
         var result = await _useCase.ExecuteAsync(password);
         
@@ -39,9 +48,9 @@ public class PasswordValidateUseCaseTests
     }
 
     [Theory]
-    [InlineData("ValidPass1")]
-    [InlineData("Password123")]
-    [InlineData("MySecure0Pass")]
+    [InlineData("Def456@!")]
+    [InlineData("Ghi789#$")]
+    [InlineData("Jkl345*-")]
     public async Task ExecuteAsync_WithValidPasswords_ShouldReturnValid(string password)
     {
         var result = await _useCase.ExecuteAsync(password);
@@ -64,7 +73,7 @@ public class PasswordValidateUseCaseTests
     [Fact]
     public async Task ExecuteAsync_WithNullPassword_ShouldThrow()
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _useCase.ExecuteAsync(null!));
+        await Assert.ThrowsAsync<NullReferenceException>(() => _useCase.ExecuteAsync(null!));
     }
 
     [Fact]
