@@ -15,7 +15,7 @@ services:
       - ./src/pwd-checker-api:/app/src/pwd-checker-api:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5238/health"]
       interval: 30s
       timeout: 10s
       retries: 3
