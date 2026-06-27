@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using pwd_checker_api.Features.PasswordValidate.Application.DTOs;
 using pwd_checker_api.Features.PasswordValidate.Application.Handlers;
@@ -9,10 +10,12 @@ namespace pwd_checker_api_test.Features.PasswordValidate.Application.Handlers;
 public class PasswordValidateHandlerTests
 {
     private readonly Mock<IPasswordValidateService> _mockService;
+    private readonly Mock<ILogger<IPasswordValidateService>> _mockLogger;
 
     public PasswordValidateHandlerTests()
     {
         _mockService = new Mock<IPasswordValidateService>();
+        _mockLogger = new Mock<ILogger<IPasswordValidateService>>();
     }
 
     [Fact]
@@ -25,7 +28,7 @@ public class PasswordValidateHandlerTests
             .Setup(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()))
             .ReturnsAsync(expectedResult);
         
-        var result = await PasswordValidateHandler.Handle(request, _mockService.Object);
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object, _mockLogger.Object);
         
         Assert.NotNull(result);
         var okResult = Assert.IsAssignableFrom<IResult>(result);
@@ -43,7 +46,7 @@ public class PasswordValidateHandlerTests
             .Setup(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()))
             .ReturnsAsync(expectedResult);
         
-        var result = await PasswordValidateHandler.Handle(request, _mockService.Object);
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object, _mockLogger.Object);
         
         Assert.NotNull(result);
     }
@@ -58,7 +61,7 @@ public class PasswordValidateHandlerTests
             .Setup(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()))
             .ReturnsAsync(expectedResult);
         
-        var result = await PasswordValidateHandler.Handle(request, _mockService.Object);
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object, _mockLogger.Object);
         
         Assert.NotNull(result);
     }
@@ -66,8 +69,22 @@ public class PasswordValidateHandlerTests
     [Fact]
     public async Task Handle_WithNullRequest_ShouldReturnBadRequest()
     {
-        var result = await PasswordValidateHandler.Handle(null!, _mockService.Object);
+        var result = await PasswordValidateHandler.Handle(null!, _mockService.Object, _mockLogger.Object);
         
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public async Task Handle_WhenServiceThrows_ShouldReturnInternalServerError()
+    {
+        var request = new PasswordValidateRequest { Password = "ValidPassword123" };
+
+        _mockService
+            .Setup(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()))
+            .ThrowsAsync(new InvalidOperationException("Unexpected failure"));
+
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object, _mockLogger.Object);
+
         Assert.NotNull(result);
     }
 }

@@ -10,6 +10,8 @@ namespace pwd_checker_api.Features.PasswordValidate.Domain.UseCases
 
         public async Task<PasswordValidateResult> ExecuteAsync(string password)
         {
+            ArgumentNullException.ThrowIfNull(password);
+
             var validateChain = BuildValidateHandlerChain();
             var validateChainResult = await validateChain.ExecuteAsync(password);
 

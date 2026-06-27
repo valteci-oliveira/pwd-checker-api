@@ -40,7 +40,7 @@ public class MinLengthHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithNullPassword_ShouldThrow()
     {
-        await Assert.ThrowsAsync<NullReferenceException>(() => _handler.ExecuteAsync(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _handler.ExecuteAsync(null!));
     }
 
     [Theory]

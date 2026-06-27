@@ -1,4 +1,5 @@
 using pwd_checker_api.Extensions;
+using pwd_checker_api.Middleware;
 
 namespace pwd_checker_api;
 
@@ -48,6 +49,8 @@ public class Program
 
     private static void ConfigureApplication(WebApplication app)
     {
+        app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
@@ -57,7 +60,6 @@ public class Program
                 c.DocumentTitle = "Password Checker API - Swagger UI";
                 c.RoutePrefix = "swagger";
             });
-            app.UseDeveloperExceptionPage();
         }
 
         app.UseHttpsRedirection();
