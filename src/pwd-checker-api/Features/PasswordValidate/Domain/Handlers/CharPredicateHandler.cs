@@ -2,15 +2,13 @@ using pwd_checker_api.Features.PasswordValidate.Domain.Interfaces;
 
 namespace pwd_checker_api.Features.PasswordValidate.Domain.Handlers
 {
-    public class MinLengthHandler : BaseHandler
+    public abstract class CharPredicateHandler : BaseHandler
     {
-        private const int MinLength = 8;
-
-        protected override string ValidationMessage => "Password is too short";
+        protected abstract Func<char, bool> CharPredicate { get; }
 
         protected override bool Validate(string password)
         {
-            return password.Length >= MinLength;
+            return password.Any(CharPredicate);
         }
     }
 }

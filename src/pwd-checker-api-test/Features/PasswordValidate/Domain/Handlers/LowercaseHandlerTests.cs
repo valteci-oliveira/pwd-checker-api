@@ -1,4 +1,5 @@
 using pwd_checker_api.Features.PasswordValidate.Domain.Handlers;
+using pwd_checker_api_test.Helpers;
 
 namespace pwd_checker_api_test.Features.PasswordValidate.Domain.Handlers;
 
@@ -9,22 +10,13 @@ public class LowercaseHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithLowercase_ShouldPass()
     {
-        var password = "password123ABC";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "password123ABC");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithoutLowercase_ShouldFail()
     {
-        var password = "PASSWORD123";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
-        Assert.Contains("lowercase", result.ResultMessage, StringComparison.OrdinalIgnoreCase);
+        await HandlerTestHelper.AssertFailsWithMessage(_handler, "PASSWORD123", "lowercase");
     }
 
     [Theory]
@@ -34,9 +26,7 @@ public class LowercaseHandlerTests
     [InlineData("a")]
     public async Task ExecuteAsync_WithLowercases_ShouldPass(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, password);
     }
 
     [Theory]
@@ -46,8 +36,6 @@ public class LowercaseHandlerTests
     [InlineData("!@#$%^")]
     public async Task ExecuteAsync_WithoutLowercases_ShouldFail(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, password);
     }
 }

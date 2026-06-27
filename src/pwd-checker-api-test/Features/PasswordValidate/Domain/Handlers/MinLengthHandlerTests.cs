@@ -1,4 +1,5 @@
 using pwd_checker_api.Features.PasswordValidate.Domain.Handlers;
+using pwd_checker_api_test.Helpers;
 
 namespace pwd_checker_api_test.Features.PasswordValidate.Domain.Handlers;
 
@@ -9,32 +10,19 @@ public class MinLengthHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithValidLength_ShouldPassToNextHandler()
     {
-        var password = "ValidPass123!";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "ValidPass123!");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithInvalidLength_ShouldFail()
     {
-        var password = "short";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
-        Assert.Contains("short", result.ResultMessage, StringComparison.OrdinalIgnoreCase);
+        await HandlerTestHelper.AssertFailsWithMessage(_handler, "short", "short");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithEmptyPassword_ShouldFail()
     {
-        var password = "";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, "");
     }
 
     [Fact]
@@ -49,9 +37,7 @@ public class MinLengthHandlerTests
     [InlineData("longerpassword")]
     public async Task ExecuteAsync_WithValidLengths_ShouldPass(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, password);
     }
 
     [Theory]
@@ -61,8 +47,6 @@ public class MinLengthHandlerTests
     [InlineData("1234567")]
     public async Task ExecuteAsync_WithInvalidLengths_ShouldFail(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, password);
     }
 }
