@@ -15,6 +15,8 @@ namespace pwd_checker_api.Features.PasswordValidate.Domain.Interfaces
 
         public virtual Task<HandlerResult> ExecuteAsync(string password)
         {
+            ArgumentNullException.ThrowIfNull(password);
+
             if (Validate(password) == false)
             {
                 return Task.FromResult(new HandlerResult { IsValid = false, ResultMessage = VALIDATION_MESSAGE });

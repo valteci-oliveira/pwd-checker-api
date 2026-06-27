@@ -7,7 +7,8 @@ public static class PasswordValidateHandler
 {
     public static async Task<IResult> Handle(
         PasswordValidateRequest request,
-        IPasswordValidateService service)
+        IPasswordValidateService service,
+        ILogger<IPasswordValidateService> logger)
     {
         if (request == null || string.IsNullOrWhiteSpace(request.Password))
         {
@@ -28,9 +29,16 @@ public static class PasswordValidateHandler
 
             return Results.Ok(result);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return Results.StatusCode(StatusCodes.Status500InternalServerError);
+            logger.LogError(ex, "Unexpected error during password validation");
+            return Results.Json(
+                new PasswordValidateResult
+                {
+                    IsValid = false,
+                    Message = "An internal error occurred while validating the password."
+                },
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }

@@ -73,7 +73,7 @@ public class PasswordValidateUseCaseTests
     [Fact]
     public async Task ExecuteAsync_WithNullPassword_ShouldThrow()
     {
-        await Assert.ThrowsAsync<NullReferenceException>(() => _useCase.ExecuteAsync(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _useCase.ExecuteAsync(null!));
     }
 
     [Fact]
