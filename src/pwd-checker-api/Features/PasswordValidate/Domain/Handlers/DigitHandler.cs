@@ -1,14 +1,8 @@
-using pwd_checker_api.Features.PasswordValidate.Domain.Interfaces;
-
 namespace pwd_checker_api.Features.PasswordValidate.Domain.Handlers
 {
-    public class DigitHandler : BaseHandler
-    {   
-        protected override bool Validate(string password)
-        {
-            VALIDATION_MESSAGE = "Password must contain at least one digit";
-
-            return password.Any(char.IsDigit);
-        }
+    public class DigitHandler : CharPredicateHandler
+    {
+        protected override string ValidationMessage => "Password must contain at least one digit";
+        protected override Func<char, bool> CharPredicate => char.IsDigit;
     }
 }

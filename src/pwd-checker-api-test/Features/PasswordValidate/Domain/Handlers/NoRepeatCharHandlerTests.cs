@@ -1,4 +1,5 @@
 using pwd_checker_api.Features.PasswordValidate.Domain.Handlers;
+using pwd_checker_api_test.Helpers;
 
 namespace pwd_checker_api_test.Features.PasswordValidate.Domain.Handlers;
 
@@ -9,22 +10,13 @@ public class NoRepeatCharHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithoutRepeatedChars_ShouldPass()
     {
-        var password = "Abc123@#";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "Abc123@#");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithRepeatedChars_ShouldFail()
     {
-        var password = "Passsword123";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
-        Assert.Contains("repeat", result.ResultMessage, StringComparison.OrdinalIgnoreCase);
+        await HandlerTestHelper.AssertFailsWithMessage(_handler, "Passsword123", "repeat");
     }
 
     [Theory]
@@ -34,9 +26,7 @@ public class NoRepeatCharHandlerTests
     [InlineData("Jkl567")]
     public async Task ExecuteAsync_WithoutRepeatedChars_WithMultiplePasswords_ShouldPass(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, password);
     }
 
     [Theory]
@@ -47,28 +37,18 @@ public class NoRepeatCharHandlerTests
     [InlineData("aabbccdd")]
     public async Task ExecuteAsync_WithRepeatedChars_WithMultiplePasswords_ShouldFail(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, password);
     }
 
     [Fact]
     public async Task ExecuteAsync_WithEmptyPassword_ShouldPass()
     {
-        var password = "";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithSingleChar_ShouldPass()
     {
-        var password = "a";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "a");
     }
 }

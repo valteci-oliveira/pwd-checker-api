@@ -1,4 +1,5 @@
 using pwd_checker_api.Features.PasswordValidate.Domain.Handlers;
+using pwd_checker_api_test.Helpers;
 
 namespace pwd_checker_api_test.Features.PasswordValidate.Domain.Handlers;
 
@@ -9,22 +10,13 @@ public class DigitHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithDigit_ShouldPass()
     {
-        var password = "password123";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "password123");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithoutDigit_ShouldFail()
     {
-        var password = "passwordonly";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
-        Assert.Contains("digit", result.ResultMessage, StringComparison.OrdinalIgnoreCase);
+        await HandlerTestHelper.AssertFailsWithMessage(_handler, "passwordonly", "digit");
     }
 
     [Theory]
@@ -34,9 +26,7 @@ public class DigitHandlerTests
     [InlineData("p1ssw0rd")]
     public async Task ExecuteAsync_WithDigits_ShouldPass(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, password);
     }
 
     [Theory]
@@ -45,8 +35,6 @@ public class DigitHandlerTests
     [InlineData("justletters")]
     public async Task ExecuteAsync_WithoutDigits_ShouldFail(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, password);
     }
 }

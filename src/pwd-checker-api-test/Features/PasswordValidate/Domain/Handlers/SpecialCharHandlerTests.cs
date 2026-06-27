@@ -1,4 +1,5 @@
 using pwd_checker_api.Features.PasswordValidate.Domain.Handlers;
+using pwd_checker_api_test.Helpers;
 
 namespace pwd_checker_api_test.Features.PasswordValidate.Domain.Handlers;
 
@@ -9,22 +10,13 @@ public class SpecialCharHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithSpecialChar_ShouldPass()
     {
-        var password = "Password123!";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "Password123!");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithoutSpecialChar_ShouldFail()
     {
-        var password = "Password123";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
-        Assert.Contains("special", result.ResultMessage, StringComparison.OrdinalIgnoreCase);
+        await HandlerTestHelper.AssertFailsWithMessage(_handler, "Password123", "special");
     }
 
     [Theory]
@@ -37,9 +29,7 @@ public class SpecialCharHandlerTests
     [InlineData("Pass-word1")]
     public async Task ExecuteAsync_WithSpecialChars_ShouldPass(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, password);
     }
 
     [Theory]
@@ -49,8 +39,6 @@ public class SpecialCharHandlerTests
     [InlineData("Pwd123")]
     public async Task ExecuteAsync_WithoutSpecialChars_ShouldFail(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, password);
     }
 }

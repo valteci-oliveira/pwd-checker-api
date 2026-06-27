@@ -5,7 +5,8 @@ namespace pwd_checker_api.Features.PasswordValidate.Domain.Interfaces
     public abstract class BaseHandler()
     {
         private BaseHandler? _nextHandler;
-        protected string? VALIDATION_MESSAGE = string.Empty;
+
+        protected abstract string ValidationMessage { get; }
 
         public BaseHandler SetNext(BaseHandler nextHandler)
         {
@@ -17,7 +18,7 @@ namespace pwd_checker_api.Features.PasswordValidate.Domain.Interfaces
         {
             if (Validate(password) == false)
             {
-                return Task.FromResult(new HandlerResult { IsValid = false, ResultMessage = VALIDATION_MESSAGE });
+                return Task.FromResult(new HandlerResult { IsValid = false, ResultMessage = ValidationMessage });
             }
 
             if (_nextHandler != null)

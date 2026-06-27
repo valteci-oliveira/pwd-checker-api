@@ -1,4 +1,5 @@
 using pwd_checker_api.Features.PasswordValidate.Domain.Handlers;
+using pwd_checker_api_test.Helpers;
 
 namespace pwd_checker_api_test.Features.PasswordValidate.Domain.Handlers;
 
@@ -9,22 +10,13 @@ public class UppercaseHandlerTests
     [Fact]
     public async Task ExecuteAsync_WithUppercase_ShouldPass()
     {
-        var password = "Password123abc";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, "Password123abc");
     }
 
     [Fact]
     public async Task ExecuteAsync_WithoutUppercase_ShouldFail()
     {
-        var password = "password123";
-        
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
-        Assert.Contains("uppercase", result.ResultMessage, StringComparison.OrdinalIgnoreCase);
+        await HandlerTestHelper.AssertFailsWithMessage(_handler, "password123", "uppercase");
     }
 
     [Theory]
@@ -34,9 +26,7 @@ public class UppercaseHandlerTests
     [InlineData("A")]
     public async Task ExecuteAsync_WithUppercases_ShouldPass(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.True(result.IsValid);
+        await HandlerTestHelper.AssertPasses(_handler, password);
     }
 
     [Theory]
@@ -46,8 +36,6 @@ public class UppercaseHandlerTests
     [InlineData("!@#$%^")]
     public async Task ExecuteAsync_WithoutUppercases_ShouldFail(string password)
     {
-        var result = await _handler.ExecuteAsync(password);
-        
-        Assert.False(result.IsValid);
+        await HandlerTestHelper.AssertFails(_handler, password);
     }
 }
