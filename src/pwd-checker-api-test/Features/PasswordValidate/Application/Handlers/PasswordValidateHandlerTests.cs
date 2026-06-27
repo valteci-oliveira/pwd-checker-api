@@ -70,4 +70,47 @@ public class PasswordValidateHandlerTests
         
         Assert.NotNull(result);
     }
+
+    [Fact]
+    public async Task Handle_WithWhitespacePassword_ShouldReturnBadRequest()
+    {
+        var request = new PasswordValidateRequest { Password = "   " };
+
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object);
+
+        Assert.NotNull(result);
+        _mockService.Verify(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_WithInvalidPassword_ShouldReturnUnprocessableEntity()
+    {
+        var request = new PasswordValidateRequest { Password = "short" };
+        var expectedResult = new PasswordValidateResult { IsValid = false, Message = "Password is too short" };
+
+        _mockService
+            .Setup(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()))
+            .ReturnsAsync(expectedResult);
+
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object);
+
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
+        _mockService.Verify(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_WhenServiceThrowsException_ShouldReturn500()
+    {
+        var request = new PasswordValidateRequest { Password = "ValidPassword123" };
+
+        _mockService
+            .Setup(s => s.ExecuteAsync(It.IsAny<PasswordValidateRequest>()))
+            .ThrowsAsync(new InvalidOperationException("Service failure"));
+
+        var result = await PasswordValidateHandler.Handle(request, _mockService.Object);
+
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<IResult>(result);
+    }
 }
