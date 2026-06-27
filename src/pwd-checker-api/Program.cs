@@ -1,3 +1,5 @@
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using pwd_checker_api.Extensions;
 
 namespace pwd_checker_api;
@@ -35,13 +37,37 @@ public class Program
         });
 
         services.AddPasswordValidateServices(configuration);
+
+        var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? Array.Empty<string>();
+
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", builder =>
+            options.AddPolicy("RestrictedCors", policy =>
             {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
+                if (allowedOrigins.Length > 0)
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .WithMethods("POST")
+                          .AllowAnyHeader();
+                }
+                else
+                {
+                    policy.AllowAnyOrigin()
+                          .WithMethods("POST")
+                          .AllowAnyHeader();
+                }
+            });
+        });
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddFixedWindowLimiter("FixedWindow", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = 30;
+                limiterOptions.Window = TimeSpan.FromMinutes(1);
+                limiterOptions.QueueLimit = 0;
             });
         });
     }
@@ -61,7 +87,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-        app.UseCors("AllowAll");
+        app.UseCors("RestrictedCors");
+        app.UseRateLimiter();
         app.UseHealthChecks("/health");
         app.ConfigureFeatures();
 

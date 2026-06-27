@@ -5,6 +5,8 @@ namespace pwd_checker_api.Features.PasswordValidate.Application.Handlers;
 
 public static class PasswordValidateHandler
 {
+    private const int MaxPasswordLength = 128;
+
     public static async Task<IResult> Handle(
         PasswordValidateRequest request,
         IPasswordValidateService service)
@@ -15,6 +17,14 @@ public static class PasswordValidateHandler
                 new PasswordValidateResult { 
                     IsValid = false,
                     Message = "Password is required." });
+        }
+
+        if (request.Password.Length > MaxPasswordLength)
+        {
+            return Results.BadRequest(
+                new PasswordValidateResult {
+                    IsValid = false,
+                    Message = $"Password must not exceed {MaxPasswordLength} characters." });
         }
 
         try

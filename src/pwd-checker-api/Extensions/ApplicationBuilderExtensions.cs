@@ -15,7 +15,8 @@ public static class ApplicationBuilderExtensions
 
         passwordGroup.MapPost("/validate", PasswordValidateHandler.Handle)
             .WithName("ValidatePassword")
-            .WithDescription("Validates a password according to security rules");
+            .WithDescription("Validates a password according to security rules")
+            .RequireRateLimiting("FixedWindow");
 
         return app;
     }
